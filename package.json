@@ -1,0 +1,37 @@
+{
+  "name": "node-microservice-scaffold",
+  "version": "1.0.0",
+  "description": "Node.js + TypeScript 微服务脚手架",
+  "private": true,
+  "scripts": {
+    "dev": "docker compose -f docker-compose.dev.yml up --build",
+    "start": "docker compose up --build -d",
+    "stop": "docker compose down",
+    "logs": "docker compose logs -f",
+    "build": "docker compose build",
+    "lint": "eslint 'services/*/src/**/*.ts' 'packages/*/src/**/*.ts'",
+    "lint:fix": "eslint 'services/*/src/**/*.ts' 'packages/*/src/**/*.ts' --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky install",
+    "clean": "rm -rf services/*/dist packages/*/dist",
+    "build:local": "npm run build:shared && npm run build:services",
+    "build:shared": "cd packages/shared && npm run build",
+    "build:services": "cd services/gateway && npm run build && cd ../user-service && npm run build"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.2.0",
+    "vitest": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

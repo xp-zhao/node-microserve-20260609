@@ -1,0 +1,12 @@
+# Docker 忽略文件
+node_modules
+dist
+.git
+.gitignore
+*.md
+.env*
+!.env.example
+coverage
+.idea
+.vscode
+*.log

@@ -1,0 +1,28 @@
+# 开发环境 Dockerfile - 支持热重载
+FROM node:20-alpine
+
+WORKDIR /app
+
+# 安装 tsx 用于开发模式
+RUN npm install -g tsx
+
+# 复制根目录的 tsconfig
+COPY tsconfig.base.json ./
+
+# 复制并构建共享模块
+COPY packages/shared ./packages/shared/
+RUN cd packages/shared && npm install && npm run build
+
+# 复制并安装用户服务
+COPY services/user-service/package.json ./services/user-service/
+COPY services/user-service/tsconfig.json ./services/user-service/
+RUN cd services/user-service && npm install
+
+WORKDIR /app/services/user-service
+
+ENV NODE_ENV=development
+
+EXPOSE 3001
+
+# 使用 tsx watch 实现热重载
+CMD ["tsx", "watch", "src/index.ts"]
