@@ -1,0 +1,53 @@
+# 开发环境 Docker Compose 配置
+# 使用命令: docker-compose -f docker-compose.dev.yml up --build
+#
+# 特性:
+# - 源码挂载，支持热重载
+# - 使用 tsx watch 监听文件变化
+# - 开发环境日志美化输出
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - GATEWAY_PORT=3000
+      - GATEWAY_REQUEST_TIMEOUT=30000
+      - USER_SERVICE_URL=http://user-service:3001
+      - LOG_LEVEL=debug
+    volumes:
+      # 挂载源码实现热重载
+      - ./services/gateway/src:/app/services/gateway/src:ro
+      - ./packages/shared/src:/app/packages/shared/src:ro
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
+    depends_on:
+      - user-service
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user-service/Dockerfile.dev
+    expose:
+      - "3001"
+    ports:
+      # 开发时也暴露端口，方便直接调试
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - USER_SERVICE_PORT=3001
+      - LOG_LEVEL=debug
+    volumes:
+      # 挂载源码实现热重载
+      - ./services/user-service/src:/app/services/user-service/src:ro
+      - ./packages/shared/src:/app/packages/shared/src:ro
+      - ./tsconfig.base.json:/app/tsconfig.base.json:ro
+    restart: unless-stopped
+
+networks:
+  default:
+    name: microservice-network-dev
